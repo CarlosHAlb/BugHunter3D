@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Hunter 3D — Campanha</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+        }
+    }
+    </script>
+</head>
+<body>
+    <main id="game"></main>
+
+    <section id="start-screen" class="overlay">
+        <div class="menu-panel menu-wide">
+            <p class="eyebrow">SISTEMA DIGITAL // CAMPANHA</p>
+            <h1>BUG HUNTER <span>3D</span></h1>
+            <p class="subtitle">Explore três mundos gigantes, colete fragmentos, sobreviva aos vírus e derrote os guardiões de cada zona.</p>
+
+            <h2>1. ESCOLHA SEU MAPA</h2>
+            <div class="map-options">
+                <button class="map-card selected" data-map="cidade">
+                    <span class="map-art map-blue"><span class="map-art-icon">▦</span><i></i><b></b></span>
+                    <strong>CIDADE DIGITAL</strong>
+                    <small>Azul e ciano</small>
+                    <em>Servidores, terminais e plataformas</em>
+                    <span class="map-lock" data-lock-for="cidade">DISPONÍVEL</span>
+                </button>
+                <button class="map-card" data-map="nucleo">
+                    <span class="map-art map-red"><span class="map-art-icon">◉</span><i></i><b></b></span>
+                    <strong>NÚCLEO DE FIREWALL</strong>
+                    <small>Vermelho e amarelo</small>
+                    <em>Reatores, tubos e zonas de calor</em>
+                    <span class="map-lock" data-lock-for="nucleo">DISPONÍVEL</span>
+                </button>
+                <button class="map-card" data-map="floresta">
+                    <span class="map-art map-green"><span class="map-art-icon">♧</span><i></i><b></b></span>
+                    <strong>FLORESTA CORROMPIDA</strong>
+                    <small>Verde e vermelho</small>
+                    <em>Ruínas, raízes e piscinas tóxicas</em>
+                    <span class="map-lock" data-lock-for="floresta">DISPONÍVEL</span>
+                </button>
+            </div>
+            <p id="map-summary" class="map-summary">Uma metrópole de computadores abandonados. Encontre o guardião escondido nos limites da cidade.</p>
+
+            <h2>2. TIPO DE PARTIDA</h2>
+            <div class="setting-options game-type-options">
+                <button class="setting-card selected" data-game-type="exploracao"><strong>EXPLORAÇÃO</strong><small>Mundo grande • mais áreas e cristais</small></button>
+                <button class="setting-card" data-game-type="rapido"><strong>JOGO RÁPIDO</strong><small>Mapa compacto • partida mais curta</small></button>
+                <button class="setting-card" data-game-type="desinfeccao"><strong>DESINFECÇÃO DO PC</strong><small>Modo em primeira pessoa • escale os níveis do gabinete e resolva desafios de desinfecção</small></button>
+            </div>
+            <p id="game-type-summary" class="setting-summary">Explore o mapa inteiro, entre nos prédios e procure os cristais escondidos.</p>
+
+            <h2>3. PERSPECTIVA</h2>
+            <div class="setting-options view-options">
+                <button class="setting-card selected" data-view="third"><strong>TERCEIRA PESSOA</strong><small>Veja seu personagem</small></button>
+                <button class="setting-card" data-view="first"><strong>PRIMEIRA PESSOA</strong><small>Olhe com o mouse após iniciar</small></button>
+            </div>
+
+            <h2>4. ESCOLHA A MÚSICA</h2>
+            <div class="setting-options music-options">
+                <button class="setting-card selected" data-music="synthwave"><strong>NEON DRIVE</strong><small>Synthwave futurista</small></button>
+                <button class="setting-card" data-music="industrial"><strong>CORE MELTDOWN</strong><small>Batida industrial</small></button>
+                <button class="setting-card" data-music="wild"><strong>WILD CIRCUIT</strong><small>Atmosfera orgânica</small></button>
+            </div>
+
+            <h2>5. ESCOLHA A DIFICULDADE</h2>
+            <div class="difficulty-options">
+                <button class="difficulty-card" data-mode="facil"><span class="difficulty-icon">🌱</span><strong>FÁCIL</strong><small>4 vidas</small><small>8 vírus • guardião leve</small></button>
+                <button class="difficulty-card selected" data-mode="medio"><span class="difficulty-icon">⚡</span><strong>MÉDIO</strong><small>3 vidas</small><small>12 vírus • guardião forte</small></button>
+                <button class="difficulty-card" data-mode="dificil"><span class="difficulty-icon">🔥</span><strong>DIFÍCIL</strong><small>2 vidas</small><small>16 vírus • guardião brutal</small></button>
+            </div>
+            <p id="mode-summary" class="mode-summary">Colete 20 cristais, depois derrote o guardião. 12 vírus patrulham o mapa.</p>
+            <button id="start-button" class="main-button">INICIAR MISSÃO →</button>
+            <button id="shop-open-button" class="secondary-button shop-open-button">LOJA DE SKINS E HABILIDADES · <span id="menu-wallet">0</span> CRÉDITOS</button>
+            <p class="keyboard-hint">WASD / SETAS: MOVER · ESPAÇO: PULAR · CLIQUE ESQUERDO: DISPARAR · E: INTERAGIR · Q: PODER · V: CÂMERA · ESC: PAUSAR</p>
+            <p class="campaign-note">Todos os mapas estão liberados. Escolha o cenário, a perspectiva, o tipo de partida e a trilha sonora antes de começar.</p>
+        </div>
+    </section>
+
+    <section id="hud" class="hud hidden">
+        <div class="hud-box hud-difficulty"><span class="hud-label">ZONA / DIFICULDADE</span><strong id="hud-mode">MÉDIO</strong></div>
+        <div class="hud-box hud-fragments"><span class="hud-label">CRISTAIS</span><strong id="hud-fragments">0 / 20</strong></div>
+        <div class="hud-box hud-score"><span class="hud-label">PONTUAÇÃO</span><strong id="hud-score">0</strong></div>
+        <div class="hud-box hud-lives"><span class="hud-label">VIDAS</span><strong id="hud-lives" class="lives">♥ ♥ ♥</strong></div>
+        <button id="pause-button" class="pause-button">PAUSAR</button>
+        <button id="camera-toggle" class="camera-toggle">V — TROCAR CÂMERA</button>
+        <div class="volume-control"><label for="volume-slider">VOLUME</label><input id="volume-slider" type="range" min="0" max="100" value="35"></div>
+        <div id="mission-time-box" class="mission-time-box hidden"><span>TEMPO DA OPERAÇÃO</span><strong id="mission-time">05:00</strong></div>
+
+        <div class="power-panel">
+            <div class="power-heading"><span id="power-title">PULSO EMP</span><strong id="power-count">0 / 4</strong></div>
+            <div class="power-meter"><div id="power-fill"></div></div>
+            <button id="power-button" class="power-button" disabled>Q — USAR PODER</button>
+            <p id="power-help" class="power-help">Colete cristais para carregar seu poder de mapa.</p>
+            <button id="attack-button" class="attack-button">CLIQUE ESQUERDO — DISPARAR PULSO</button>
+            <div class="ammo-counter"><span>MUNIÇÃO DO EMISSOR</span><strong id="ammo-count">10 / 10</strong></div>
+        </div>
+        <div id="interaction-prompt" class="interaction-prompt hidden">
+            <strong id="interaction-title">COMPONENTE INFECTADO</strong>
+            <span id="interaction-description">Pressione E para iniciar o diagnóstico.</span>
+            <button id="interact-button" class="power-button">E — DESINFECTAR</button>
+        </div>
+        <div id="stealth-status" class="stealth-status hidden">VOCÊ ESTÁ ESCONDIDO</div>
+        <div id="boss-panel" class="boss-panel hidden">
+            <div class="boss-heading"><span id="boss-name">GUARDIÃO</span><strong id="boss-health-text">5 / 5</strong></div>
+            <div class="boss-meter"><div id="boss-health-fill"></div></div>
+            <p>Use o EMP quando ele estiver perto.</p>
+        </div>
+        <div id="event-message" class="event-message hidden">GUARDIÃO DETECTADO</div>
+        <div class="game-hint">WASD / setas: mover · Espaço: pular · Clique esquerdo: disparar · Q: poder · V: câmera<br>Na desinfecção: E abre o protocolo. Resolva antes de o tempo acabar.</div>
+    </section>
+
+
+    <aside id="minimap-panel" class="minimap-panel hidden" aria-label="Minimapa da missão">
+        <div class="minimap-title"><span>RADAR DE AMEAÇAS</span><strong id="minimap-threat-count">0</strong></div>
+        <canvas id="minimap-canvas" width="220" height="220"></canvas>
+        <div class="minimap-legend"><span><i class="legend-player"></i>VOCÊ</span><span><i class="legend-virus"></i>VÍRUS</span><span><i class="legend-target"></i>INFECÇÃO</span></div>
+    </aside>
+
+    <section id="challenge-screen" class="overlay hidden">
+        <div class="menu-panel small-panel challenge-panel">
+            <p class="eyebrow">PROTOCOLO DE DESINFECÇÃO</p>
+            <h1 id="challenge-title">DIAGNÓSTICO</h1>
+            <p id="challenge-description" class="subtitle">Resolva o desafio para remover o vírus.</p>
+            <div id="challenge-timer" class="challenge-timer">TEMPO DO PROTOCOLO: 35s</div>
+            <div id="challenge-target" class="challenge-target"></div>
+            <div id="challenge-options" class="challenge-options"></div>
+            <p id="challenge-feedback" class="challenge-feedback" aria-live="polite"></p>
+            <button id="challenge-submit" class="main-button">VALIDAR PROTOCOLO</button>
+            <button id="challenge-cancel" class="secondary-button">VOLTAR AO COMPUTADOR</button>
+        </div>
+    </section>
+
+    <section id="shop-screen" class="overlay hidden">
+        <div class="menu-panel menu-wide shop-panel">
+            <p class="eyebrow">CENTRO DE PERSONALIZAÇÃO</p>
+            <h1>LOJA <span>DE DADOS</span></h1>
+            <p class="subtitle">Use os créditos conquistados nas missões para desbloquear novas aparências e melhorias permanentes.</p>
+            <div class="shop-wallet">SALDO DISPONÍVEL <strong id="shop-wallet">0</strong> <span>CRÉDITOS</span></div>
+            <h2>SKINS DO OPERADOR</h2>
+            <div id="shop-skins" class="shop-grid"></div>
+            <h2>HABILIDADES PERMANENTES</h2>
+            <div id="shop-abilities" class="shop-grid"></div>
+            <p id="shop-feedback" class="challenge-feedback" aria-live="polite"></p>
+            <button id="shop-close-button" class="main-button">VOLTAR AO MENU</button>
+        </div>
+    </section>
+
+    <section id="pause-screen" class="overlay hidden">
+        <div class="menu-panel small-panel">
+            <p class="eyebrow">MISSÃO INTERROMPIDA</p><h1>PAUSADO</h1>
+            <p class="subtitle">O mundo digital está esperando por você.</p>
+            <button id="resume-button" class="main-button">CONTINUAR</button>
+            <button id="menu-button" class="secondary-button">SELECIONAR MAPA</button>
+        </div>
+    </section>
+
+    <section id="end-screen" class="overlay hidden">
+        <div class="menu-panel small-panel">
+            <p class="eyebrow">RELATÓRIO DA MISSÃO</p>
+            <h1 id="end-title">MISSÃO CONCLUÍDA!</h1>
+            <p id="end-message" class="subtitle"></p>
+            <div class="result-score">PONTUAÇÃO FINAL<strong id="end-score">0</strong></div>
+            <button id="restart-button" class="main-button">VOLTAR À SELEÇÃO DE MAPAS</button>
+        </div>
+    </section>
+
+    <div id="first-person-reticle" class="first-person-reticle hidden" aria-hidden="true"></div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
